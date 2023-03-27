@@ -12,7 +12,7 @@ export class RemindersService {
     @InjectModel(Reminder.name) private readonly reminderModel: Model<Reminder>,
   ) {}
 
-  async findAll() {
+  async findAll(): Promise<{ [key: string]: Reminder }> {
     // return this.reminderModel.find().exec();
     const allReminders: Reminder[] = await this.reminderModel.find().exec();
     // return allReminders;
@@ -37,18 +37,21 @@ export class RemindersService {
     return reminders;
   }
 
-  async findOne(id: string) {
+  async findOne(id: string): Promise<{} | Reminder> {
     const reminder = await this.reminderModel.find({ _id: id }).exec();
     if (!reminder) throw new NotFoundException('Reminder not found.');
     return reminder;
   }
 
-  create(createReminderDto: CreateReminderDto) {
+  create(createReminderDto: CreateReminderDto): Promise<Reminder> {
     const reminder = new this.reminderModel({ ...createReminderDto });
     return reminder.save();
   }
 
-  async update(id: string, updateReminderDto: UpdateReminderDto) {
+  async update(
+    id: string,
+    updateReminderDto: UpdateReminderDto,
+  ): Promise<Reminder> {
     const existingReminder = await this.reminderModel
       .findOneAndUpdate({ _id: id }, { $set: updateReminderDto }, { new: true })
       .exec();
